@@ -24,7 +24,7 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<Set<Book>> getAllBooksByAuthor(@PathVariable(value = "authorId") String authorId){
+    public ResponseEntity<ResponseDto> getAllBooksByAuthor(@PathVariable(value = "authorId") String authorId){
         return ResponseEntity.ok(bookService.getBooksByAuthorId(authorId));
     }
 
@@ -42,7 +42,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{bookId}/delete")
-    public ResponseEntity<String> deleteBookByIdAndByAuthorId(@PathVariable(value = "authorId") String authorId,@PathVariable(value = "bookId") String bookId){
+    public ResponseEntity<ResponseDto> deleteBookByIdAndByAuthorId(@PathVariable(value = "authorId") String authorId,@PathVariable(value = "bookId") String bookId){
         return ResponseEntity.ok(bookService.deleteBookByIdAndAuthorId(bookId,authorId));
     }
 

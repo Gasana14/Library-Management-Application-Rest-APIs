@@ -40,7 +40,7 @@ public class BookService {
                responseDto.setSuccess(true);
                responseDto.setMessage("Book successfully Updated");
             }else{
-                responseDto.setObj(null);
+                responseDto.setObj("Book failed to be updated");
                 responseDto.setStatus(HttpStatus.BAD_REQUEST);
                 responseDto.setSuccess(false);
                 responseDto.setMessage("Bad Request, try again");
@@ -73,15 +73,25 @@ public class BookService {
         return existingBook;
     }
 
-    public Set<Book> getBooksByAuthorId(String authorId){
+    public ResponseDto getBooksByAuthorId(String authorId){
+        ResponseDto responseDto = new ResponseDto();
         // get author by id
         Author author = authorRepository.findById(authorId).orElse(null);
         // set of books
         Set<Book> authorBooks = new HashSet<>();
         if(author!=null){
-            return authorBooks = bookRepository.findBooksByAuthorId(authorId);
+             authorBooks = bookRepository.findBooksByAuthorId(authorId);
+             responseDto.setObj(authorBooks);
+             responseDto.setSuccess(true);
+             responseDto.setStatus(HttpStatus.OK);
+             responseDto.setMessage("Book was found");
+            return responseDto;
         }else{
-           return authorBooks;
+            responseDto.setObj("Failed to find the book");
+            responseDto.setSuccess(false);
+            responseDto.setStatus(HttpStatus.NOT_FOUND);
+            responseDto.setMessage("Book was found");
+            return responseDto;
         }
     }
 
@@ -99,6 +109,7 @@ public class BookService {
             responseDto.setMessage("Failed to find Book");
             responseDto.setStatus(HttpStatus.NOT_FOUND);
             responseDto.setObj(null);
+            responseDto.setSuccess(false);
         }
         return responseDto;
     }
@@ -121,21 +132,30 @@ public class BookService {
         }else{
             responseDto.setMessage("Failed to update Book");
             responseDto.setStatus(HttpStatus.BAD_REQUEST);
-            responseDto.setObj(null);
+            responseDto.setObj("Bad Request, book was not updated");
+            responseDto.setSuccess(false);
         }
         return responseDto;
     }
 
 
-    public String deleteBookByIdAndAuthorId(String bookId,String authorId){
+    public ResponseDto deleteBookByIdAndAuthorId(String bookId,String authorId){
         ResponseDto responseDto = new ResponseDto();
         // find by id
         Book book = bookRepository.findBookByIdAndAuthorId(bookId,authorId);
         if(book!=null){
             bookRepository.delete(book);
-            return "Book is successfully deleted";
+            responseDto.setObj("Book is deleted successfully");
+            responseDto.setSuccess(true);
+            responseDto.setMessage("Book was found and deleted successfully");
+            responseDto.setStatus(HttpStatus.OK);
+            return responseDto;
         }else{
-            return "Failed to delete a book";
+            responseDto.setObj("Failed to delete a book");
+            responseDto.setSuccess(false);
+            responseDto.setMessage("Failed to find a book, Failed to delete a book");
+            responseDto.setStatus(HttpStatus.BAD_REQUEST);
+            return responseDto;
         }
 
     }
