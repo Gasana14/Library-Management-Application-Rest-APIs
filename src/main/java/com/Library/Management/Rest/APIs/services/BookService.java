@@ -1,17 +1,22 @@
 package com.Library.Management.Rest.APIs.services;
 
+import com.Library.Management.Rest.APIs.dtos.AuthorDto;
+import com.Library.Management.Rest.APIs.dtos.BookDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
 import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
+import com.Library.Management.Rest.APIs.exception.ResourceNotFoundException;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.models.Book;
 import com.Library.Management.Rest.APIs.repositories.AuthorRepository;
 import com.Library.Management.Rest.APIs.repositories.BookRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -21,22 +26,31 @@ public class BookService {
     @Autowired
     private AuthorRepository authorRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
 
-    public ResponseDto saveBook(Book book,String authorId){
+
+    public ResponseDto saveBook(BookDto bookDto, String authorId){
         ResponseDto responseDto = new ResponseDto();
 
+        // convert dto to entity
+        Book book = mapToEntity(bookDto);
+
         // find author to assign to a specific book
-        Author author = authorRepository.findById(authorId).orElse(null);
+        Author author = authorRepository.findById(authorId).orElseThrow(()-> new ResourceNotFoundException("Author","id",authorId));
 
         // check if the book id is null or not
         if(book.getId()!=null){
             // check if book entity exist in our database
-            Book existingBook = bookRepository.findById(book.getId()).orElse(null);
+            Book existingBook = bookRepository.findById(book.getId()).orElseThrow(()-> new ResourceNotFoundException("Book","id",book.getId()));
 
             // check if book entity exist in our database
             if(existingBook!=null){
                existingBook = updateExistingBook(existingBook,book,author);
-               responseDto.setObj(existingBook);
+
+               // convert from entity to dto
+                BookDto existingBookDto = mapToDto(existingBook);
+               responseDto.setObj(existingBookDto);
                responseDto.setStatus(HttpStatus.OK);
                responseDto.setSuccess(true);
                responseDto.setMessage("Book successfully Updated");
@@ -64,6 +78,29 @@ public class BookService {
     }
 
 
+    private Book mapToEntity(BookDto bookDto){
+        Book book = modelMapper.map(bookDto,Book.class);
+        return book;
+    }
+
+    private BookDto mapToDto(Book book){
+        BookDto bookDto =  modelMapper.map(book,BookDto.class);
+        return bookDto;
+    }
+
+
+
+    private Author mapToEntity(AuthorDto authorDto){
+        Author author = modelMapper.map(authorDto,Author.class);
+        return author;
+    }
+
+    private AuthorDto mapToDto(Author author){
+        AuthorDto authorDto =  modelMapper.map(author,AuthorDto.class);
+        return authorDto;
+    }
+
+
     private Book updateExistingBook(Book existingBook,Book updatedBook,Author author){
         existingBook.setCategory(updatedBook.getCategory());
         existingBook.setTitle(updatedBook.getTitle());
@@ -77,12 +114,17 @@ public class BookService {
     public ResponseDto getBooksByAuthorId(String authorId){
         ResponseDto responseDto = new ResponseDto();
         // get author by id
-        Author author = authorRepository.findById(authorId).orElse(null);
+        Author author = authorRepository.findById(authorId).orElseThrow(()-> new ResourceNotFoundException("Author","id",authorId));
+
+
+
         // set of books
         Set<Book> authorBooks = new HashSet<>();
         if(author!=null){
              authorBooks = bookRepository.findBooksByAuthorId(authorId);
-             responseDto.setObj(authorBooks);
+             // convert entity to dto
+            Set<AuthorDto> authorDtos = authorBooks.stream().map(auth-> mapToDto(author)).collect(Collectors.toSet());
+             responseDto.setObj(authorDtos);
              responseDto.setSuccess(true);
              responseDto.setStatus(HttpStatus.OK);
              responseDto.setMessage("Book was found");
@@ -104,7 +146,10 @@ public class BookService {
         if(book!=null){
             responseDto.setMessage(book.getTitle()+" Book is found");
             responseDto.setStatus(HttpStatus.OK);
-            responseDto.setObj(book);
+
+            // convert entity to dto
+            BookDto bookDto = mapToDto(book);
+            responseDto.setObj(bookDto);
             responseDto.setSuccess(true);
         }else{
             responseDto.setMessage("Failed to find Book");
@@ -115,20 +160,26 @@ public class BookService {
         return responseDto;
     }
 
-    public ResponseDto updateBookByIdAndAuthorId(String bookId,String authorId,Book bookObj){
+    public ResponseDto updateBookByIdAndAuthorId(String bookId,String authorId,BookDto bookDtoObj){
         ResponseDto responseDto = new ResponseDto();
+
+        // converty dto to entity
+        Book bookEntity = mapToEntity(bookDtoObj);
+
         // find by id
         Book book = bookRepository.findBookByIdAndAuthorId(bookId,authorId);
         if(book!=null){
 
-            book.setTitle(bookObj.getTitle());
-            book.setIsbn(bookObj.getIsbn());
-            book.setPrice(bookObj.getPrice());
-            book.setCategory(bookObj.getCategory());
+            book.setTitle(bookEntity.getTitle());
+            book.setIsbn(bookEntity.getIsbn());
+            book.setPrice(bookEntity.getPrice());
+            book.setCategory(bookEntity.getCategory());
             bookRepository.save(book);
             responseDto.setMessage("Book is successfully Updated");
             responseDto.setStatus(HttpStatus.OK);
-            responseDto.setObj(book);
+            // convert entity to dto
+            BookDto updatedBookDto = mapToDto(book);
+            responseDto.setObj(updatedBookDto);
             responseDto.setSuccess(true);
         }else{
             responseDto.setMessage("Failed to update Book");

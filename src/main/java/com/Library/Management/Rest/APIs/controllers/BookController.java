@@ -1,8 +1,10 @@
 package com.Library.Management.Rest.APIs.controllers;
 
+import com.Library.Management.Rest.APIs.dtos.BookDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
 import com.Library.Management.Rest.APIs.models.Book;
 import com.Library.Management.Rest.APIs.services.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +21,8 @@ public class BookController {
 
 
     @PostMapping
-    public ResponseEntity<ResponseDto> createBook(@PathVariable(value = "authorId") String authorId, @RequestBody Book book){
-        return new ResponseEntity<>(bookService.saveBook(book,authorId), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> createBook(@PathVariable(value = "authorId") String authorId,@Valid  @RequestBody BookDto bookDto){
+        return new ResponseEntity<>(bookService.saveBook(bookDto,authorId), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -37,8 +39,8 @@ public class BookController {
     public ResponseEntity<ResponseDto> updateBookByIdAndByAuthorId(
             @PathVariable(value = "authorId") String authorId,
             @PathVariable(value = "bookId") String bookId,
-            @RequestBody Book book){
-        return ResponseEntity.ok(bookService.updateBookByIdAndAuthorId(bookId,authorId,book));
+            @Valid @RequestBody BookDto bookDto){
+        return ResponseEntity.ok(bookService.updateBookByIdAndAuthorId(bookId,authorId,bookDto));
     }
 
     @DeleteMapping("/{bookId}/delete")
