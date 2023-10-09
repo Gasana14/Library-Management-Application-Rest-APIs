@@ -1,6 +1,7 @@
 package com.Library.Management.Rest.APIs.services;
 
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
+import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.models.Book;
 import com.Library.Management.Rest.APIs.repositories.AuthorRepository;
@@ -87,7 +88,7 @@ public class BookService {
              responseDto.setMessage("Book was found");
             return responseDto;
         }else{
-            responseDto.setObj("Failed to find the book");
+            responseDto.setObj(null);
             responseDto.setSuccess(false);
             responseDto.setStatus(HttpStatus.NOT_FOUND);
             responseDto.setMessage("Book was found");

@@ -1,9 +1,12 @@
 package com.Library.Management.Rest.APIs.services;
 
+import com.Library.Management.Rest.APIs.dtos.AuthorDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
 import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
+import com.Library.Management.Rest.APIs.exception.ResourceNotFoundException;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.repositories.AuthorRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorService {
@@ -20,16 +24,20 @@ public class AuthorService {
    @Autowired
     private AuthorRepository authorRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
 
 
 
-    public ResponseDto saveAuthor(Author author) {
+
+    public ResponseDto saveAuthor(AuthorDto authorDto) {
         ResponseDto responseDto = new ResponseDto();
+        Author author = mapToEntity(authorDto);
 
         // Check if the author has an ID (existing author) or not (new author)
         if (author.getId() != null) {
             // Author with ID exists, attempt to update
-            Author existingAuthor = authorRepository.findById(author.getId()).orElse(null);
+            Author existingAuthor = authorRepository.findById(author.getId()).orElseThrow(()-> new ResourceNotFoundException("Author","id",author.getId()));
 
             if (existingAuthor != null) {
                 // Update the existing author
@@ -37,7 +45,10 @@ public class AuthorService {
                 responseDto.setMessage("Author is updated successfully");
                 responseDto.setSuccess(true);
                 responseDto.setStatus(HttpStatus.OK);
-                responseDto.setObj(existingAuthor);
+
+                // map entity to dto
+                AuthorDto updatedDto = mapToDto(existingAuthor);
+                responseDto.setObj(updatedDto);
             } else {
                 responseDto.setMessage("Author with the provided ID does not exist, We cannot perform update");
                 responseDto.setSuccess(false);
@@ -50,10 +61,22 @@ public class AuthorService {
             responseDto.setMessage("Author is successfully created");
             responseDto.setSuccess(true);
             responseDto.setStatus(HttpStatus.CREATED);
-            responseDto.setObj(newAuthor);
+            // map entity to dto
+            AuthorDto savedDto = mapToDto(newAuthor);
+            responseDto.setObj(savedDto);
         }
 
         return responseDto;
+    }
+
+    private Author mapToEntity(AuthorDto authorDto){
+        Author author = modelMapper.map(authorDto,Author.class);
+        return author;
+    }
+
+    private AuthorDto mapToDto(Author author){
+        AuthorDto authorDto =  modelMapper.map(author,AuthorDto.class);
+        return authorDto;
     }
 
 
@@ -68,7 +91,9 @@ public class AuthorService {
    public ResponseDto findAll(){
     ResponseDto responseDto = new ResponseDto();
     List<Author> authors = authorRepository.findAll();
-    responseDto.setObj(authors);
+    // map list of author entities to dtos
+    List<AuthorDto> authorDtos = authors.stream().map(author -> mapToDto(author)).collect(Collectors.toList());
+    responseDto.setObj(authorDtos);
     responseDto.setSuccess(true);
     responseDto.setMessage("List of all authors");
     responseDto.setStatus(HttpStatus.OK);
@@ -86,19 +111,23 @@ public class AuthorService {
         responseDto.setSuccess(true);
         responseDto.setStatus(HttpStatus.OK);
         responseDto.setMessage("List of all Authors in page format");
-        responseDto.setObj(authorRepository.findAll(pageable));
+        // conver list to dtos
+        Page<AuthorDto> authorDtos = authorRepository.findAll(pageable).map(author -> mapToDto(author));
+        responseDto.setObj(authorDtos);
 
         return responseDto;
     }
 
     public ResponseDto getAuthorById(String id){
         ResponseDto responseDto = new ResponseDto();
-        Author author = authorRepository.findById(id).orElseThrow(()-> new LibraryManagementException(HttpStatus.NOT_FOUND,"Author with given id "+id+" was not found"));
+        Author author = authorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Author","id",id));
         if(author!=null){
             responseDto.setStatus(HttpStatus.OK);
             responseDto.setSuccess(true);
             responseDto.setMessage(String.format("Author %s was found",author.getName(),id));
-            responseDto.setObj(author);
+            // map entity to dto
+            AuthorDto authorDto = mapToDto(author);
+            responseDto.setObj(authorDto);
         }else{
             responseDto.setStatus(HttpStatus.NOT_FOUND);
             responseDto.setSuccess(false);
@@ -112,7 +141,7 @@ public class AuthorService {
         ResponseDto responseDto = new ResponseDto();
 
         // find author by id
-        Author author = authorRepository.findById(id).orElse(null);
+        Author author = authorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Author","id",id));
 
         if(author!=null){
             authorRepository.delete(author);
@@ -130,6 +159,7 @@ public class AuthorService {
         }
 
     }
+
 
 
 }

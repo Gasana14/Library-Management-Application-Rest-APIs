@@ -1,9 +1,11 @@
 package com.Library.Management.Rest.APIs.controllers;
 
+import com.Library.Management.Rest.APIs.dtos.AuthorDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.services.AuthorService;
 import com.Library.Management.Rest.APIs.utils.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,13 +22,13 @@ public class AuthorControllers {
     private AuthorService authorService;
 
     @PostMapping
-    public ResponseEntity<ResponseDto> createAuthor(@RequestBody Author author){
-       return new ResponseEntity<>(authorService.saveAuthor(author), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> createAuthor(@Valid @RequestBody AuthorDto authorDto){
+       return new ResponseEntity<>(authorService.saveAuthor(authorDto), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<ResponseDto> updateAuthor(@RequestBody Author author){
-        return ResponseEntity.ok( authorService.saveAuthor(author));
+    public ResponseEntity<ResponseDto> updateAuthor(@Valid @RequestBody AuthorDto authorDto){
+        return ResponseEntity.ok( authorService.saveAuthor(authorDto));
     }
 
     @GetMapping("")

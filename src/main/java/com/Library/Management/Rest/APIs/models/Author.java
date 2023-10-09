@@ -22,6 +22,6 @@ public class Author {
     private String name;
     private Integer age;
     private String address;
-    @OneToMany(mappedBy = "author",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "author",fetch = FetchType.EAGER)
     Set<Book> books;
 }
