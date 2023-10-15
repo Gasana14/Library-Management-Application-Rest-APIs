@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +21,12 @@ public class AuthorControllers {
 
     @Autowired
     private AuthorService authorService;
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ResponseDto> createAuthor(@Valid @RequestBody AuthorDto authorDto){
        return new ResponseEntity<>(authorService.saveAuthor(authorDto), HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
     public ResponseEntity<ResponseDto> updateAuthor(@Valid @RequestBody AuthorDto authorDto){
         return ResponseEntity.ok( authorService.saveAuthor(authorDto));
@@ -54,7 +55,7 @@ public class AuthorControllers {
         return ResponseEntity.ok(authorService.getAuthorById(authorId));
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<ResponseDto> deleteAuthorById(@PathVariable(value = "id") String authorId){
         return ResponseEntity.ok(authorService.deleteAuthor(authorId));
