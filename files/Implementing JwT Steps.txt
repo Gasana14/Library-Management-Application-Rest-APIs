@@ -43,4 +43,83 @@ app-jwt-expiration-millesconds=604800000
 -----------------------------------------------------
 Inside the jwt package create this class called
 > JwtTokenProvider (Do copy & Paste)
+> JwtAuthenticationFilter (Do copy & Paste)
+> JwtAuthResponse (Do copy & Paste)
+		
+   * After creating JwtAuthResponse we have to configure SecurityConfig Class
+     > Go to SecurityConfig and add these attributes
+
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+
+    Then modify the securityFilterChain function by adding the excpetions
+
+    // http basic
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf((csrf) -> csrf.disable())
+                .authorizeHttpRequests((authorize) ->
+                        //authorize.anyRequest().authenticated()
+                        authorize.requestMatchers(HttpMethod.GET,"/api/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .anyRequest().authenticated()
+                ).httpBasic(Customizer.withDefaults())
+    //             These codes below are related to JWT Token
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                ).sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+
+        // apply jwt authentication fitler before spring boot security
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }		
+
+
+5. Change the AuthService Class Login function & Auth Controller
+------------------------------------------------------------------
+A. In AuthService Class add the autowires
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    <>Change the login function to
+
+    public String login(LoginDto loginDto) {
+        Authentication authentication =   authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(),loginDto.getPassword()));
+
+        // store our authentication into Security Context
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtTokenProvider.generateJwtToken(authentication);
+
+        return token;
+    }
+
+    <>Change the login controller
+
+	 @PostMapping(value = {"/login","/signin"})
+    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto){
+        String token = authService.login(loginDto);
+
+        JwtAuthResponse jwtAuthResponseDto = new JwtAuthResponse();
+        jwtAuthResponseDto.setAccessToken(token);
+
+        return ResponseEntity.ok(jwtAuthResponseDto);
+    }	
+
+
+
+	
+	
+
+
 	
