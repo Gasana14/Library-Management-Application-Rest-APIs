@@ -4,6 +4,7 @@ import com.Library.Management.Rest.APIs.dtos.AuthorDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
 import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
 import com.Library.Management.Rest.APIs.exception.ResourceNotFoundException;
+import com.Library.Management.Rest.APIs.jwt.JwtTokenProvider;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.repositories.AuthorRepository;
 import org.modelmapper.ModelMapper;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +28,8 @@ public class AuthorService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+
 
 
 

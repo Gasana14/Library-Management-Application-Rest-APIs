@@ -3,6 +3,7 @@ package com.Library.Management.Rest.APIs.services;
 import com.Library.Management.Rest.APIs.dtos.LoginDto;
 import com.Library.Management.Rest.APIs.dtos.RegisterDto;
 import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
+import com.Library.Management.Rest.APIs.jwt.JwtTokenProvider;
 import com.Library.Management.Rest.APIs.models.Role;
 import com.Library.Management.Rest.APIs.models.User;
 import com.Library.Management.Rest.APIs.repositories.RoleRepository;
@@ -23,9 +24,6 @@ import java.util.Set;
 public class AuthService {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -34,14 +32,34 @@ public class AuthService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    public String login(LoginDto loginDto){
-    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(),loginDto.getPassword()));
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-    // place authentication into security context holder
-      SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      return "User Logged in Successfully";
+    //  Login with Basic Auth
+//    public String login(LoginDto loginDto){
+//    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(),loginDto.getPassword()));
+//
+//    // place authentication into security context holder
+//      SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//      return "User Logged in Successfully";
+//    }
+
+    //  Login with JWT Token
+
+    public String login(LoginDto loginDto) {
+        Authentication authentication =   authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(),loginDto.getPassword()));
+
+        // store our authentication into Security Context
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtTokenProvider.generateJwtToken(authentication);
+
+        return token;
     }
 
     public String register(RegisterDto registerDto){

@@ -2,6 +2,7 @@ package com.Library.Management.Rest.APIs.controllers;
 
 import com.Library.Management.Rest.APIs.dtos.LoginDto;
 import com.Library.Management.Rest.APIs.dtos.RegisterDto;
+import com.Library.Management.Rest.APIs.jwt.JwtAuthResponse;
 import com.Library.Management.Rest.APIs.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,23 @@ public class AuthController {
 
 
 
-    // Build Login REST API
-    @PostMapping(value = {"/login","signin"})
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
-       String response =  authService.login(loginDto);
-       return ResponseEntity.ok(response);
+    // Build Login REST API With Basic Auth
+//    @PostMapping(value = {"/login","signin"})
+//    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+//       String response =  authService.login(loginDto);
+//       return ResponseEntity.ok(response);
+//    }
+
+
+    // Build Login REST API With Jwt authentication
+    @PostMapping(value = {"/login","/signin"})
+    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto){
+        String token = authService.login(loginDto);
+
+        JwtAuthResponse jwtAuthResponseDto = new JwtAuthResponse();
+        jwtAuthResponseDto.setAccessToken(token);
+
+        return ResponseEntity.ok(jwtAuthResponseDto);
     }
 
     // Build Register REST API

@@ -1,0 +1,46 @@
+Implementing JwT Steps
+==================================
+1. Add JwT Dependencies in the POM file
+----------------------------------------
+<!-- implementing jwt -->
+
+<dependency>
+<groupId>io.jsonwebtoken</groupId>
+<artifactId>jjwt-impl</artifactId>
+<version>0.12.3</version>
+<scope>runtime</scope>			
+</dependency>		
+
+<dependency>
+<groupId>io.jsonwebtoken</groupId>
+<artifactId>jjwt-api</artifactId>
+<version>0.12.3</version>
+</dependency>
+
+<dependency>
+<groupId>io.jsonwebtoken</groupId>
+<artifactId>jjwt-jackson</artifactId>
+<version>0.12.3</version>
+<scope>runtime</scope>
+</dependency>
+
+2. Creating Jwt Package This Class
+-------------------------------------------------
+ i. Create page named as jwt
+ ii. Create class in that package named JwtAuthenticationEntryPoint (Do copy & Paste)
+
+3. Go to Application Properties file
+-------------------------------------------------
+Go to Application Properties files and add these codes
+
+#implement jwt
+#secret = 123 ( i just hashed by using SHA 256 Online tool)
+app.jwt-secret=a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3
+#expiration time in millesconds ( 7 days = 604800000)
+app-jwt-expiration-millesconds=604800000
+
+4. Create another Class inside the jwt Package
+-----------------------------------------------------
+Inside the jwt package create this class called
+> JwtTokenProvider (Do copy & Paste)
+	
