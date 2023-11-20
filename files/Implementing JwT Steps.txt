@@ -114,7 +114,10 @@ A. In AuthService Class add the autowires
         jwtAuthResponseDto.setAccessToken(token);
 
         return ResponseEntity.ok(jwtAuthResponseDto);
-    }	
+    }
+
+
+Re Run the application	
 
 
 
