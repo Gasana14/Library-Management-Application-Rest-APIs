@@ -4,6 +4,7 @@ import com.Library.Management.Rest.APIs.dtos.BookDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
 import com.Library.Management.Rest.APIs.models.Book;
 import com.Library.Management.Rest.APIs.services.BookService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,9 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/authors/{authorId}/books")
+@Tag(
+        name = "CRUD REST APIs for Book Resource"
+)
 public class BookController {
     @Autowired
     private BookService bookService;

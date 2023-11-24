@@ -1,0 +1,130 @@
+API DOCUMENTATION
+------------------------
+> Springdoc-openapi java library helps to automate the generation of API Documentation using spring boot project
+
+> Springdoc-openapi java provides integration between spring-boot and swagger-ui. automatically generates
+
+documentation in JSON/YAML and HTML format APIs
+
+This Library supports:
+  > OpenAPI 3
+  > Spring-boot v3 (Java17 & Jakarta EE9)
+  > JSR-303, specifically for @NotNull,@Min,@Max and @Size
+  > Swagger-ui
+  > OAuth 2
+
+API DOCUMENTATION DEVELOPMENT STEPS
+------------------------------------------
+1. Adding springdoc-openapi Maven dependency
+   
+Go to Maven and Copy this dependency
+<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.2.0</version>
+</dependency>
+
+Go to POM XML file and paste the dependency
+	
+
+2. Enable Spring security for Swagger URLs (Public access)
+
+Go to SecurityConfig Class and 
+allow the http://localhost:8080/swagger-ui/index.html#/ access (permit all)
+allow the http://localhost:8080/v3/api-docs access (permit all)
+
+add these two lines:
+ .requestMatchers("/swagger-ui/**").permitAll()
+ .requestMatchers("/v3/api-docs/**").permitAll()
+
+
+3. Define General Information (Using Annotations)
+
+Go to Main Class (that Runs application and add the following annotations)
+
+@OpenAPIDefinition(
+		info = @Info(
+				title = "Spring boot Library Management APIs",
+				description = "Spring boot Library Management APIs Documentation",
+				version = "V1.0",
+				contact = @Contact(
+						name = "Gasana Theopile",
+						email = "gasana141414@gmail.com",
+						url = "https://github.com/Gasana14"
+				),
+				license = @License(
+						name = "Apache 2.0",
+						url = "https://github.com/Gasana14"
+				)
+		),
+		externalDocs = @ExternalDocumentation(
+				description = "Spring boot Library Management APIs External Documentation",
+				url = "https://github.com/Gasana14"
+		)
+)
+
+
+
+
+4. Adding Authorization Header in Requests using @SecurityRequirement and @SecurityScheme
+
+Go to SecurityConfig Class  and add the following annotations on this Class
+
+@SecurityScheme(
+        name = "Bearer Authentication",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
+
+Go to Controller Class (eg Author) and add the following annotation
+
+    @SecurityRequirement(
+            name = "Bearer Authentication"  (the name should be the same from securityConfig
+    )
+
+
+
+
+
+5. Customizing Swagger API Documentation with Annotations
+
+Go to Controller (eg AuthorController) and:
+add this annotation @Tag
+	@Tag(
+        	name = "CRUD REST APIs for Author Resource"
+	)
+
+Go to REST APIs eg( POST REST API) and :
+add this annotation @Operation and @ApiResponse
+
+    @Operation(
+            summary = "Create POST REST API",
+            description = "Create Author REST API is used to save Author into database"
+    )
+    @ApiResponse(
+            responseCode = "201",
+            description = "Http Status 201 Created"
+    )
+
+
+
+
+6. Customizing Swagger Models Documentation with Annotations
+
+Go to Dtos eg (AuthorDto) and :
+add this annotation on AuthorDto Class
+
+@Schema(
+        description = "AuthorDto Model Information"
+)
+
+and this annotations on AuthorDto attributes eg:
+
+@Schema(
+            description = "Author full name"
+)
+   
+private String name;
+
