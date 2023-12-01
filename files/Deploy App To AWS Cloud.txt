@@ -1,0 +1,100 @@
+Understanding AWS 
+============================================
+AWS (Amazon Web Services) :Amazon Web Services, or AWS, professionals can perform a variety of jobs related to cloud computing, database administration, computer security, computer engineering, and computer development.
+
+AWS Offers many services, but now we are going to look at few services:
+------------------------------------------------------------------------
+> Amazon EC2 : is a web services that provides secure,resizable compute capacity in the cloud. we need EC2 to
+create a virtual server (to install Java,Tomcat,Mysql), it act as PC where we install Java,Tomcat,Mysql etc
+
+> AWS Elastic Beanstalk : It helps to deploy web application for different languages (Java,Python,.Net...), you can
+simply upload your codes and Elastic Beanstalk automatically handles the deployment, from capacity provisioning,
+load balancing,auto-scaling to application health monitoring.
+
+> RDS (Amazon Relational Database Service) : Helps us to deal with anything related to Database, provides us 
+a cloud database and it supports (MySQL,Postgres,MariaDb etc)
+
+> Amazon S3 : Object storage built to store and retrieve any amount of data from anywhere 
+(eg: you want to upload JAR file or WAR file, the uploaded codes are stored in Amazon S3 Bucket)
+
+> Amazon Route 53 : A reliable and cost effective way to route end users to internet applications
+(eg: whenever you deploy your codes/application to aws, you will need to configure domain name for your application eg:www.myapplication.com)
+
+
+
+Steps to Deploy App(REST APIs) To AWS Cloud
+==================================================
+(Creating Profiles)
+-----------------------
+> Open your application and go to resources
+> Modify the application.properties file (Creating Profiles : this means creatind different application.properties for specific environment (Dev,Prod,QA) etc)
+> application.properties file (contains all the common codes for both proprties files and then other properties file contains unique codes)
+NB: Check Resources folder (application.properties)
+
+(Creating Meta data)
+------------------------
+> We have two options, we can use sql files to create/update tables + insert / update datas on database creation or we can have use built in ways to insert data on application Run
+> 1st option : Go to Run Application Class and add Command Line Runner (eg : public class LibraryManagementRestApIsApplication implements CommandLineRunner) and implements the required function
+
+@Override
+public void run(String... args) throws Exception {
+		
+}
+
+that's the function that is going to help us to insert data on application run, then we need to autowire repositories to help us to save data into database
+
+@Override
+public void run(String... args) throws Exception {
+	Role adminRole = new Role();
+	adminRole.setName("ROLE_ADMIN");
+	roleRepository.save(adminRole);
+		
+	Role userRole = new Role();
+	userRole.setName("ROLE_USER");
+	roleRepository.save(userRole);
+}
+
+> If you dont have account on AWS/ you have to create it on aws
+
+(Setup / Configure MySQL on AWS)
+--------------------------------
+> After logged in, Go to Services
+> Go to Databases and the Go to RDS
+> Find Create database
+> Choose a database creation method ( select Standard Create)
+> Engine options (select Mysql)
+> Templates ( if you dont want to pay, select Free Tier)
+> Settings : DB instance identifier( Give a name to your instance eg: learning-aws-dbs)
+           : Master username ( Give a username to your instance eg: root)
+           : Master password ( Give a password to your instance eg: awsroot123)
+	   : Confirm master password ( Repeat a password to your instance eg: awsroot123)
+
+> Connectivity : Public access ( select yes)
+> keep other by default as it is
+> create on create database
+> once the database is created and the status is Available, click on identifier name of ur db instance
+> click on Security VPC > security groups > click on default link to configure the security
+> inside the table, click on Security group ID
+> on Inbound Rule table, click Edit Inbound Rules
+> Click on Add Rule btn, and under Type info column choose Mysql/Aurora and Under Source Column choose IP/V4 anywhere and click on save rules
+
+(Connect AWS Mysql Database from MySQL Workbench)
+--------------------------------------------------
+> Open Workbench
+> Create a new Connection
+> under hostname: (copy the Endpoint from AWS Database instance and paste it there)
+> under username (use the username used while configureing aws db instance)
+> under password (store Vault) (use the password used while configureing aws db instance)
+> Test the connection by click on Test the connection to make sure everything is ok
+> the open your connection and create a database there (eg : library)
+
+(Creating Application JAR File to Upload)
+----------------------------------------------------
+
+	
+
+
+
+
+
+
