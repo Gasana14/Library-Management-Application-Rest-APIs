@@ -18,7 +18,7 @@ import lombok.Setter;
 )
 public class AuthorDtoRequest {
 
-    private String id="0";
+    private String id;
     @Schema(
             description = "Author full name"
     )
