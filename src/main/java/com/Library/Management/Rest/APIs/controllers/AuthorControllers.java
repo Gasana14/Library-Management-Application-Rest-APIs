@@ -1,8 +1,7 @@
 package com.Library.Management.Rest.APIs.controllers;
 
-import com.Library.Management.Rest.APIs.dtos.AuthorDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
-import com.Library.Management.Rest.APIs.models.Author;
+import com.Library.Management.Rest.APIs.dtos.requests.AuthorDtoRequest;
 import com.Library.Management.Rest.APIs.services.AuthorService;
 import com.Library.Management.Rest.APIs.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,13 +10,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/authors")
@@ -43,8 +39,8 @@ public class AuthorControllers {
     )
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ResponseDto> createAuthor(@Valid @RequestBody AuthorDto authorDto){
-       return new ResponseEntity<>(authorService.saveAuthor(authorDto), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> createAuthor(@Valid @RequestBody AuthorDtoRequest authorDtoRequest){
+       return new ResponseEntity<>(authorService.saveAuthor(authorDtoRequest), HttpStatus.CREATED);
     }
 
     @SecurityRequirement(
@@ -60,8 +56,8 @@ public class AuthorControllers {
     )
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
-    public ResponseEntity<ResponseDto> updateAuthor(@Valid @RequestBody AuthorDto authorDto){
-        return ResponseEntity.ok( authorService.saveAuthor(authorDto));
+    public ResponseEntity<ResponseDto> updateAuthor(@Valid @RequestBody AuthorDtoRequest authorDtoRequest){
+        return ResponseEntity.ok( authorService.saveAuthor(authorDtoRequest));
     }
 
     @Operation(

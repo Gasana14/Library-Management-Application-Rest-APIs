@@ -1,9 +1,10 @@
 package com.Library.Management.Rest.APIs.services;
 
-import com.Library.Management.Rest.APIs.dtos.AuthorDto;
-import com.Library.Management.Rest.APIs.dtos.BookDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
-import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
+import com.Library.Management.Rest.APIs.dtos.requests.AuthorDtoRequest;
+import com.Library.Management.Rest.APIs.dtos.requests.BookDtoRequest;
+import com.Library.Management.Rest.APIs.dtos.responses.AuthorDtoResponse;
+import com.Library.Management.Rest.APIs.dtos.responses.BookDtoResponse;
 import com.Library.Management.Rest.APIs.exception.ResourceNotFoundException;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.models.Book;
@@ -30,11 +31,11 @@ public class BookService {
     private ModelMapper modelMapper;
 
 
-    public ResponseDto saveBook(BookDto bookDto, String authorId){
+    public ResponseDto saveBook(BookDtoRequest bookDtoRequest, String authorId){
         ResponseDto responseDto = new ResponseDto();
 
         // convert dto to entity
-        Book book = mapToEntity(bookDto);
+        Book book = mapToEntity(bookDtoRequest);
 
         // find author to assign to a specific book
         Author author = authorRepository.findById(authorId).orElseThrow(()-> new ResourceNotFoundException("Author","id",authorId));
@@ -49,8 +50,8 @@ public class BookService {
                existingBook = updateExistingBook(existingBook,book,author);
 
                // convert from entity to dto
-                BookDto existingBookDto = mapToDto(existingBook);
-               responseDto.setObj(existingBookDto);
+               BookDtoResponse existingBookDtoResponse = mapToDtoResponse(existingBook);
+               responseDto.setObj(existingBookDtoResponse);
                responseDto.setStatus(HttpStatus.OK);
                responseDto.setSuccess(true);
                responseDto.setMessage("Book successfully Updated");
@@ -69,7 +70,9 @@ public class BookService {
             responseDto.setMessage("Book is successfully created");
             responseDto.setSuccess(true);
             responseDto.setStatus(HttpStatus.CREATED);
-            responseDto.setObj(newBook);
+            // convert from entity to dto
+            BookDtoResponse newBookDtoResponse = mapToDtoResponse(newBook);
+            responseDto.setObj(newBookDtoResponse);
         }
 
 
@@ -78,26 +81,46 @@ public class BookService {
     }
 
 
-    private Book mapToEntity(BookDto bookDto){
-        Book book = modelMapper.map(bookDto,Book.class);
+    private Book mapToEntity(BookDtoRequest bookDtoRequest){
+        Book book = modelMapper.map(bookDtoRequest,Book.class);
         return book;
     }
 
-    private BookDto mapToDto(Book book){
-        BookDto bookDto =  modelMapper.map(book,BookDto.class);
-        return bookDto;
+    private Book mapToEntityResponse(BookDtoResponse bookDtoResponse){
+        Book book = modelMapper.map(bookDtoResponse,Book.class);
+        return book;
+    }
+
+    private BookDtoRequest mapToDto(Book book){
+        BookDtoRequest bookDtoRequest =  modelMapper.map(book,BookDtoRequest.class);
+        return bookDtoRequest;
+    }
+
+    private BookDtoResponse mapToDtoResponse(Book book){
+        BookDtoResponse bookDtoResponse =  modelMapper.map(book,BookDtoResponse.class);
+        return bookDtoResponse;
     }
 
 
 
-    private Author mapToEntity(AuthorDto authorDto){
-        Author author = modelMapper.map(authorDto,Author.class);
+    private Author mapToEntity(AuthorDtoRequest authorDtoRequest){
+        Author author = modelMapper.map(authorDtoRequest,Author.class);
         return author;
     }
 
-    private AuthorDto mapToDto(Author author){
-        AuthorDto authorDto =  modelMapper.map(author,AuthorDto.class);
-        return authorDto;
+    private Author mapToEntityResponse(AuthorDtoResponse authorDtoResponse){
+        Author author = modelMapper.map(authorDtoResponse,Author.class);
+        return author;
+    }
+
+    private AuthorDtoRequest mapToDto(Author author){
+        AuthorDtoRequest authorDtoRequest =  modelMapper.map(author,AuthorDtoRequest.class);
+        return authorDtoRequest;
+    }
+
+    private AuthorDtoResponse mapToDtoResponse(Author author){
+        AuthorDtoResponse authorDtoResponse =  modelMapper.map(author,AuthorDtoResponse.class);
+        return authorDtoResponse;
     }
 
 
@@ -123,8 +146,8 @@ public class BookService {
         if(author!=null){
              authorBooks = bookRepository.findBooksByAuthorId(authorId);
              // convert entity to dto
-            Set<AuthorDto> authorDtos = authorBooks.stream().map(auth-> mapToDto(author)).collect(Collectors.toSet());
-             responseDto.setObj(authorDtos);
+            Set<AuthorDtoResponse> authorDtoResponses = authorBooks.stream().map(auth-> mapToDtoResponse(author)).collect(Collectors.toSet());
+             responseDto.setObj(authorDtoResponses);
              responseDto.setSuccess(true);
              responseDto.setStatus(HttpStatus.OK);
              responseDto.setMessage("Book was found");
@@ -148,8 +171,8 @@ public class BookService {
             responseDto.setStatus(HttpStatus.OK);
 
             // convert entity to dto
-            BookDto bookDto = mapToDto(book);
-            responseDto.setObj(bookDto);
+            BookDtoResponse bookDtoResponse = mapToDtoResponse(book);
+            responseDto.setObj(bookDtoResponse);
             responseDto.setSuccess(true);
         }else{
             responseDto.setMessage("Failed to find Book");
@@ -160,11 +183,11 @@ public class BookService {
         return responseDto;
     }
 
-    public ResponseDto updateBookByIdAndAuthorId(String bookId,String authorId,BookDto bookDtoObj){
+    public ResponseDto updateBookByIdAndAuthorId(String bookId,String authorId,BookDtoRequest bookDtoObjRequest){
         ResponseDto responseDto = new ResponseDto();
 
         // converty dto to entity
-        Book bookEntity = mapToEntity(bookDtoObj);
+        Book bookEntity = mapToEntity(bookDtoObjRequest);
 
         // find by id
         Book book = bookRepository.findBookByIdAndAuthorId(bookId,authorId);
@@ -178,8 +201,8 @@ public class BookService {
             responseDto.setMessage("Book is successfully Updated");
             responseDto.setStatus(HttpStatus.OK);
             // convert entity to dto
-            BookDto updatedBookDto = mapToDto(book);
-            responseDto.setObj(updatedBookDto);
+            BookDtoResponse updatedBookDtoResponse = mapToDtoResponse(book);
+            responseDto.setObj(updatedBookDtoResponse);
             responseDto.setSuccess(true);
         }else{
             responseDto.setMessage("Failed to update Book");

@@ -1,8 +1,5 @@
-package com.Library.Management.Rest.APIs.dtos;
+package com.Library.Management.Rest.APIs.dtos.requests;
 
-import com.Library.Management.Rest.APIs.models.Author;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,7 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookDto {
+public class BookDtoRequest {
 
     private String id;
     @NotEmpty
@@ -32,5 +29,5 @@ public class BookDto {
     @NotNull
     @Size(min = 2,message = "Book Category should not be less than 2 characters")
     private String category;
-    private AuthorDto authorDto;
+
 }

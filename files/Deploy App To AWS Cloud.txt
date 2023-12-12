@@ -90,6 +90,48 @@ public void run(String... args) throws Exception {
 
 (Creating Application JAR File to Upload)
 ----------------------------------------------------
+> Go to AWS Database Instance Under Connectivity & Security > Endpoint Link copy the link (eg : learning-aws-dbs.cngf1ioyf5uv.eu-north-1.rds.amazonaws.com)
+> Inside ur IDE Project, edit your application-prod.properties file, edit Mysql datasource link (eg: spring.datasource.url = jdbc:mysql://learning-aws-dbs.cngf1ioyf5uv.eu-north-1.rds.amazonaws.com:3306/library?useSSL=false&serverTimezone=UTC) here, we have replaced localhost with the endpoint link
+> then edit username and password with the aws username and password used for configuration / setup
+> edit application-prod.properties file by specifying the server port as 5000 (server.port=5000) because aws uses 5000 port
+> update the application.properties file by editing profile active to prod file "spring.profiles.active=prod" (this means that it will consider application-prod.properties as the main file)
+> to create JAR file, on the Right side of your IDE IntilJ click on MAVEN symbol and select your project > Lifecycle and select clean and install and click on Run Maven Build
+> it will create the JAR file in your project under the target folder
+
+(Deploy the JAR File to AWS Cloud)
+------------------------------------------------------
+> Go AWS Services > Compute > Elastic Bean Stalkbean
+> Click on create application
+> Application information > Application name (Give it a name eg : springboot-library-management-app)
+> Environment information > Domain name (give a domain eg: www.springboot-library-management-app)
+> Choose platform > Select Java
+> Application code > Select Upload Your code > Local File ( go where your project is stored on local pc, under project > under target folder select the app Jar file)
+> Version label ( give it any name eg: springboot-library-management-app-source)
+> Click on next ( To Go to the next configuration )
+
+Configure Service Access (If it is the first time, you should create ec2 role eg: go to this link on youtube: https://www.youtube.com/watch?v=3h7PMHnilkM this link will show you how to create ec2)
+~~~~~~~~~~~~~~~~~~~~~~~~
+> But if you already have ec2 Role created, you can use existing role by selecting the following:
+> Configure service access > Service role > select Use an existing service role
+> Configure service access > Existing service roles > select : aws-elasticbeanstalk-service-role
+> Configure service access > EC2 Instance Profile > select : your create ec2 role (eg: aws-elastic-beanstalk-ec2-role)
+
+Set up networking, database, and tags - optional 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Database Info > Enable database
+> Put your RDS Database credentails (username and password )
+> click next
+
+Configure updates, monitoring, and logging - optional Info
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> Platform software Info > Environment properties > add environment property for port ( name : SERVER_PORT , key : 5000)
+> click next
+
+After configuring services, then click on SUBMIT and wait for application to be created
+
+
+
+
 
 	
 

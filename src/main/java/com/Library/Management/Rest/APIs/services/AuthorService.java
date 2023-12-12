@@ -1,10 +1,9 @@
 package com.Library.Management.Rest.APIs.services;
 
-import com.Library.Management.Rest.APIs.dtos.AuthorDto;
 import com.Library.Management.Rest.APIs.dtos.ResponseDto;
-import com.Library.Management.Rest.APIs.exception.LibraryManagementException;
+import com.Library.Management.Rest.APIs.dtos.requests.AuthorDtoRequest;
+import com.Library.Management.Rest.APIs.dtos.responses.AuthorDtoResponse;
 import com.Library.Management.Rest.APIs.exception.ResourceNotFoundException;
-import com.Library.Management.Rest.APIs.jwt.JwtTokenProvider;
 import com.Library.Management.Rest.APIs.models.Author;
 import com.Library.Management.Rest.APIs.repositories.AuthorRepository;
 import org.modelmapper.ModelMapper;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,9 +32,9 @@ public class AuthorService {
 
 
 
-    public ResponseDto saveAuthor(AuthorDto authorDto) {
+    public ResponseDto saveAuthor(AuthorDtoRequest authorDtoRequest) {
         ResponseDto responseDto = new ResponseDto();
-        Author author = mapToEntity(authorDto);
+        Author author = mapToEntity(authorDtoRequest);
 
         // Check if the author has an ID (existing author) or not (new author)
         if (author.getId() != null) {
@@ -51,8 +49,8 @@ public class AuthorService {
                 responseDto.setStatus(HttpStatus.OK);
 
                 // map entity to dto
-                AuthorDto updatedDto = mapToDto(existingAuthor);
-                responseDto.setObj(updatedDto);
+                AuthorDtoRequest updatedDtoRequest = mapToDto(existingAuthor);
+                responseDto.setObj(updatedDtoRequest);
             } else {
                 responseDto.setMessage("Author with the provided ID does not exist, We cannot perform update");
                 responseDto.setSuccess(false);
@@ -66,21 +64,32 @@ public class AuthorService {
             responseDto.setSuccess(true);
             responseDto.setStatus(HttpStatus.CREATED);
             // map entity to dto
-            AuthorDto savedDto = mapToDto(newAuthor);
-            responseDto.setObj(savedDto);
+            AuthorDtoRequest savedDtoRequest = mapToDto(newAuthor);
+            responseDto.setObj(savedDtoRequest);
         }
 
         return responseDto;
     }
 
-    private Author mapToEntity(AuthorDto authorDto){
-        Author author = modelMapper.map(authorDto,Author.class);
+    private Author mapToEntity(AuthorDtoRequest authorDtoRequest){
+        Author author = modelMapper.map(authorDtoRequest,Author.class);
         return author;
     }
 
-    private AuthorDto mapToDto(Author author){
-        AuthorDto authorDto =  modelMapper.map(author,AuthorDto.class);
-        return authorDto;
+    private Author mapToEntityResponse(AuthorDtoResponse authorDtoResponse){
+        Author author = modelMapper.map(authorDtoResponse,Author.class);
+        return author;
+    }
+
+    private AuthorDtoRequest mapToDto(Author author){
+        AuthorDtoRequest authorDtoRequest =  modelMapper.map(author,AuthorDtoRequest.class);
+        return authorDtoRequest;
+    }
+
+
+    private AuthorDtoResponse mapToDtoResponse(Author author){
+        AuthorDtoResponse authorDtoResponse =  modelMapper.map(author,AuthorDtoResponse.class);
+        return authorDtoResponse;
     }
 
 
@@ -96,8 +105,8 @@ public class AuthorService {
     ResponseDto responseDto = new ResponseDto();
     List<Author> authors = authorRepository.findAll();
     // map list of author entities to dtos
-    List<AuthorDto> authorDtos = authors.stream().map(author -> mapToDto(author)).collect(Collectors.toList());
-    responseDto.setObj(authorDtos);
+    List<AuthorDtoResponse> authorDtoResponses = authors.stream().map(author -> mapToDtoResponse(author)).collect(Collectors.toList());
+    responseDto.setObj(authorDtoResponses);
     responseDto.setSuccess(true);
     responseDto.setMessage("List of all authors");
     responseDto.setStatus(HttpStatus.OK);
@@ -116,8 +125,8 @@ public class AuthorService {
         responseDto.setStatus(HttpStatus.OK);
         responseDto.setMessage("List of all Authors in page format");
         // conver list to dtos
-        Page<AuthorDto> authorDtos = authorRepository.findAll(pageable).map(author -> mapToDto(author));
-        responseDto.setObj(authorDtos);
+        Page<AuthorDtoResponse> authorDtoResponses = authorRepository.findAll(pageable).map(author -> mapToDtoResponse(author));
+        responseDto.setObj(authorDtoResponses);
 
         return responseDto;
     }
@@ -130,8 +139,8 @@ public class AuthorService {
             responseDto.setSuccess(true);
             responseDto.setMessage(String.format("Author %s was found",author.getName(),id));
             // map entity to dto
-            AuthorDto authorDto = mapToDto(author);
-            responseDto.setObj(authorDto);
+            AuthorDtoResponse authorDtoResponse = mapToDtoResponse(author);
+            responseDto.setObj(authorDtoResponse);
         }else{
             responseDto.setStatus(HttpStatus.NOT_FOUND);
             responseDto.setSuccess(false);

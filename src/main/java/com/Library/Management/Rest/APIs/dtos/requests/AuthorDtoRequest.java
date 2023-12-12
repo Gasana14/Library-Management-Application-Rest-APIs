@@ -1,4 +1,4 @@
-package com.Library.Management.Rest.APIs.dtos;
+package com.Library.Management.Rest.APIs.dtos.requests;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,18 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(
-        description = "AuthorDto Model Information"
+        description = "AuthorDto Request Model Information"
 )
-public class AuthorDto {
+public class AuthorDtoRequest {
 
-    private String id;
+    private String id="0";
     @Schema(
             description = "Author full name"
     )
@@ -43,8 +41,4 @@ public class AuthorDto {
     @Size(max = 100,message = "Address should not exceed 100 characters")
     private String address;
 
-    @Schema(
-            description = "Set of Books"
-    )
-    Set<BookDto> books;
 }
