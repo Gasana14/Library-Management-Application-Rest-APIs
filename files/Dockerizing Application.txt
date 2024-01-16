@@ -1,0 +1,12 @@
+Steps
+----------------------
+1. Create a Docker File (A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.)
+
+   1.1 Before create a docker file: on IntelliJ go To Maven and select project > Lifecycle > select clean and package and Run
+
+2. Generate Docker Image from Docker File by running a command (docker build)
+
+3. Put the Docker Image into a container by running a command (docker run)
+
+4. Push Docker container to Docker Hub
+
