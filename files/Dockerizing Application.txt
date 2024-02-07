@@ -1,3 +1,39 @@
+UNDERSTANDING DOCKER
+====================================
+
+Developer
+    |                                                                      /----------------- Pull Image ------------ Docker Image -----> Docker container  (Staging Environment)
+    |---------------------> Docker Image --------------------> Docker Hub : 
+    |                            |                                         \------------------ Pull Image ------------ Docker Image -----> Docker container (Test Environment)     
+Dockerfile                  Docker container
+
+
+
+Explaination of the Graph Above:
+======================================
+Developer create a Dockerfile : Dockerfile is a text that contains all the instructions / commands to build the Docker image by using (docker build command to build image)
+
+Docker Image : is executable package and we can run that image in Docker container / we can use docker run command to run the image inside Docker container
+
+Docker container : is a running instance of docker image / where docker images are executed
+
+Docker Hub: after creating docker image, we push that image to docker hub (using docker push command), with that Docker Hub then we can pull image in specific environment (eg Test environment or Stage Environment)
+
+
+
+STEPS TO IMPLEMENT DOCKERIZATION WITH SPRING BOOT APPLICATION + MYSQL
+==========================================================================
+Step 1. Go to Project Root (Same Level as Pom.xml file) and create a file named Dockerfile
+
+Step 2. Writing instructions inside Dockerfile
+
+
+
+
+
+
+
+
 STEP 1 (This for Simple Spring boot Application without Database (MYSQL)
 -----------------------------------------------------------------------------
 1. First step to dockerize, on your IDE (IntelliJ) on the right side, go To Maven, Select your project, select Lifecycle, select Clean and Package, this will generate extra files in your target
@@ -74,6 +110,13 @@ spring.jpa.properties.dialect = org.hibernate.dialect.MySQL8Dialect
 
 										  (network name)              (container name)           (host port:container port)	 (application image name)							
 14. We are going to run our docker by the following command:docker run  --network springboot-mysql-net --name springboot-mysql-container -p 8080:8080 cody14/springboot-library-management:0.0.1.RELEASE
+
+15. From there the access your docker desktop and start your containers and try run your APIs in POSTMAN
+
+16. To verify access ur mysqldbcontainer by :
+ docker exec -it 6e32 bash then press enter
+   mysql -u root -p press enter
+   enter password (root)
 
 
 
