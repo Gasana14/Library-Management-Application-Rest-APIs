@@ -1,12 +1,85 @@
-Steps
-----------------------
-1. Create a Docker File (A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.)
+STEP 1 (This for Simple Spring boot Application without Database (MYSQL)
+-----------------------------------------------------------------------------
+1. First step to dockerize, on your IDE (IntelliJ) on the right side, go To Maven, Select your project, select Lifecycle, select Clean and Package, this will generate extra files in your target
+folder including the Jar files
 
-   1.1 Before create a docker file: on IntelliJ go To Maven and select project > Lifecycle > select clean and package and Run
 
-2. Generate Docker Image from Docker File by running a command (docker build)
+2. Create a Docker File (A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.)
 
-3. Put the Docker Image into a container by running a command (docker run)
+  
+eg: 
+     
+FROM openjdk:17
+WORKDIR /app
+COPY target/docker-0.0.1-SNAPSHOT.jar /app/no-sql-docker.jar
+ENTRYPOINT ["java", "-jar", "no-sql-docker.jar"]
 
-4. Push Docker container to Docker Hub
+
+3.After step 2. remember to Start your Desktop Docker App
+
+4. Generate Docker Image from Docker File by using CMD (Administrator) and navigate to your project folder location (eg:users/documents/projects/project-name>) and Run this command:
+   docker build -t cody14/no-sql-docker:0.0.1 . ( -t is for tags cody14(docker hub username) / image-name is the image you want to rename : 0.0.1 can be like version and last Dot means root folder
+	
+5. Put the Docker Image into a container by running a command (docker run) 
+   docker run -p 8080:8080 --name no-sql-docker-container cody14/no-sql-docker:0.0.1 (-p shows hostport:containerport --name indicate the name of container docker hub username/docker image name
+
+6. Push Docker container to Docker Hub
+
+
+
+-----------------------------------------------------------------------------
+STEP 2 (This for Simple Spring boot Application without Database (MYSQL)
+-----------------------------------------------------------------------------
+1. First step is to get MYSQL Image by using the following command : docker pull mysql:latest
+2. Create a network for MysqlC DB container to be able to talk to my Springboo Application container by the following command:docker network create springboot-mysql-net
+3. Run Mysql in specific container name by the following command : docker run --name mysqldbcontainer --network springboot-mysql-net -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=librarydb -d mysql:latest
+4. check containers : docker ps
+5. how to access mysql in docker container:
+   docker exec -it 6e32 bash then press enter
+   mysql -u root -p press enter
+   enter password (root)
+6. The next step is to generate springboot image
+7. Go to your springboot application and With Intellij go to Maven, select your Project,select Lifecycle, select clean and package to generate jars in target folder
+8. Go to root of your project and create Dockerfile
+   eg:
+
+FROM openjdk:17
+
+LABEL mentainer="gasana1414@gmail.com"
+
+WORKDIR /app
+
+COPY target/Library-Management-Rest-APIs-0.0.1-SNAPSHOT.jar /app/springboot-library-management.jar
+
+ENTRYPOINT ["java", "-jar", "springboot-library-management.jar"]
+
+9. After go to resources folder and create a new file called application-docker.properties which will hold the docker information
+   eg:
+
+spring.datasource.url = jdbc:mysql://mysqldbcontainer:3306/librarydb
+spring.datasource.username= root
+spring.datasource.password= root
+
+# Hibernate Properties
+spring.jpa.hibernate.ddl-auto =update
+spring.jpa.properties.dialect = org.hibernate.dialect.MySQL8Dialect
+
+10. then activate docker profile from application.properties by spring.profiles.active=docker
+
+11. Go to your springboot application and With Intellij go to Maven, select your Project,select Lifecycle, select clean and package to generate jars in target folder // remember to disable tests cases
+
+12. Next step is to build springboot application image by the following command : docker build -t cody14/springboot-library-management:0.0.1.RELEASE .
+
+13. We are going to see how springboot application service in docker container communicate with mysql service in docker container
+
+										  (network name)              (container name)           (host port:container port)	 (application image name)							
+14. We are going to run our docker by the following command:docker run  --network springboot-mysql-net --name springboot-mysql-container -p 8080:8080 cody14/springboot-library-management:0.0.1.RELEASE
+
+
+
+
+
+
+
+
 
