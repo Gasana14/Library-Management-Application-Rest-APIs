@@ -120,9 +120,51 @@ spring.jpa.properties.dialect = org.hibernate.dialect.MySQL8Dialect
 
 
 
+----------------------------------------------------------------------------------
+ANOTHER WAY OF DOCKERIZING USING DOCKER COMPOSE
+----------------------------------------------------------------------------------
+
+Docker compose : is way / tool for defining and running multi-container docker applications by creating docker compose .yml file
+
+NB: First if you already used the first options and created some images, first remove them by : docker rmi -f image-id
+
+1. Create docker-compose.yml file on the root of the project and configure your services ( eg :application & mysql )
+eg:
+
+version: "3.8"
+
+services:
+  mysqldbcontainer:
+    container_name: mysqldbcontainer
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: librarydb
+    networks:
+      springboot-mysql-net:
+
+  springboot-library-management:
+    container_name: springboot-library-management
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysqldbcontainer
+    networks:
+      springboot-mysql-net:
+    restart: on-failure
+
+networks:
+  springboot-mysql-net:
 
 
+2. after configuring your docker-compose.yml run this command : docker-compose up / docker-compose up -d --build (to run it in the background)
 
+3. to check the logs use this command : docker logs -f mysqldbcontainer / to quit do ctr + c
+
+4. to stopp all docker containers running use this command: docker-compose down
 
 
 

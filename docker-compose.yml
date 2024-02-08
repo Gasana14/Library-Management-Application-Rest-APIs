@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  mysqldbcontainer:
+    container_name: mysqldbcontainer
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: librarydb
+    networks:
+      springboot-mysql-net:
+
+  springboot-library-management:
+    container_name: springboot-library-management
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysqldbcontainer
+    networks:
+      springboot-mysql-net:
+    restart: on-failure
+
+networks:
+  springboot-mysql-net:
